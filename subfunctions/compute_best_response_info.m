@@ -1,6 +1,8 @@
-function [sols, market_share, profits] = compute_best_response_info(p_grid, alpha, s_1)
+function [sols, market_share, profits] = compute_best_response_info(p_grid, alpha, s_1, activation)
 
 
+
+options = optimoptions('fmincon', 'Display','off');
 fineness = length(p_grid);
 sols = zeros(fineness,1);
 market_share = zeros(fineness,2);
@@ -25,7 +27,7 @@ for ii = 1:fineness
                                                         (p_a - alpha - p_b <0)   *  (alpha+p_b-p_a<=1) * (1/2-(p_a-alpha-p_b)-(p_a-alpha-p_b)^2/2) + ...
                                                         (p_a - alpha - p_b <0)   *  (alpha+p_b-p_a>1))) + ...
                                              (1-s_1) * ...      % We move to the case where the guy is actually B, so you serve the wrong good
-                                                ((p_a<1)*(1-p_a))* ...    % Probability of people buying your good even you serve the wrong good
+                                                (p_a<1)*(1-p_a)* ...    % Probability of people buying your good even you serve the wrong good
                                                     (0.5 * ...            % Probability of the other guy playing A as well (so getting it wrong too
                                                         ((p_a-p_b >= 0) *  (p_a-p_b<=1) *   (1/2-(p_a-p_b)+(p_a-p_b)^2/2) + ...      % Probability of getting the consumer with p_a superior to p_b but not by 1
                                                         (p_a-p_b < 0)  *  (p_b-p_a<=1) *    (1/2 - (p_a-p_b) - (p_a-p_b)^2/2) + ...        % Probability of getting the consumer with p_a inferior to p_b
@@ -36,7 +38,7 @@ for ii = 1:fineness
                                                         (p_a + alpha - p_b <0)   *  (-alpha+p_b-p_a>1))));                             % Rest if p_a + 1 - p_b < 0
     
     % Find the maximum
-    sols(ii) = fmincon(exp_utility_platform_info, p_grid(ii), -1, 0);
+    sols(ii) = fmincon(exp_utility_platform_info, p_grid(ii), -1, 0, [], [], [], [], [], options);
     
     % The proportion of agent A you're taking in
     p_a = sols(ii);
@@ -65,12 +67,19 @@ for ii = 1:fineness
 end
 
 % Do a simple plot
-figure
-yyaxis left
-plot(p_grid, sols)
-yyaxis right
-plot(p_grid, full_market_share)
-hold on 
-plot(p_grid,profits)
-legend('Price', 'Expected market share', 'Profits')
+if activation == 1
+    figure
+    yyaxis left
+    plot(p_grid, sols)
+    hold on
+    plot(p_grid,p_grid)
+    ylabel('Best Response')
+    yyaxis right
+    plot(p_grid, full_market_share)
+    hold on
+    plot(p_grid,profits)
+    ylabel('Profits/Market share')
+    xlabel('Price of opponent')
+    legend('Price', '45° line', 'Expected market share', 'Profits')
+end
 end

@@ -1,6 +1,7 @@
 function [sols, market_share_type_1, market_share_type_2, profits] = compute_best_response_uninfo(p_grid, alpha, s_1, activate)
 
 
+options = optimoptions('fmincon', 'Display','off');
 fineness = length(p_grid);
 sols = zeros(fineness,1);
 market_share_type_1 = zeros(fineness,2);
@@ -63,7 +64,7 @@ for ii = 1:fineness
                                         (p_a-p_b <  0)*  (p_b-p_a>1))));
     % Let's find the equilibrium
     
-    sols(ii) = fmincon(exp_util_other, p_grid(ii), -1, 0);
+    sols(ii) = fmincon(exp_util_other, p_grid(ii), -1, 0, [], [], [], [], [], options);
     
     % We can compute expected market shares, there are a lot more,
     % depending on the type of the other
@@ -107,10 +108,15 @@ if activate == 1
     figure
     yyaxis left
     plot(p_grid, sols)
+    hold on
+    plot(p_grid, p_grid)
+    ylabel('Best Response')
     yyaxis right
     plot(p_grid, full_market_share(:,1))
     hold on
     plot(p_grid, profits)
-    legend('Price', 'Expected Market share', 'Expected Profits')
+    ylabel('Profits/Market share')
+    xlabel('Price of opponent')
+    legend('Price', '45° line', 'Expected Market share', 'Expected Profits')
 end
 end

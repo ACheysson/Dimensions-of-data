@@ -1,4 +1,4 @@
-function [sols, market_share] = first_period(p_grid, future_gain, alpha, beta)
+function [sols, market_share] = first_period(p_grid, future_gain, alpha)
 
 %
 %
@@ -17,7 +17,7 @@ profits = zeros(fineness,2);
 for ii = 1:fineness
     % Change p_b
     p_b = p_grid(ii);
-    exp_util_other = @(p_a) -(p_a + beta*future_gain)* ...   % The utilty you extract out of every guy
+    exp_util_other = @(p_a) -(p_a + future_gain)* ...   % The utilty you extract out of every guy
                             	(0.5 * ...                   % The probability you play A
                                     (0.5 * ...               % The probability the other plays A
                                         (0.5 * ...           % The mass of agents A
