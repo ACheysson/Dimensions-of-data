@@ -1,4 +1,4 @@
-function [price_s, market, profits] = first_period(p_grid, future_gain, future_loss, alpha, graphs)
+function [price_s, market, profits] = br_equal(p_grid, future_gain, future_loss, alpha, graphs)
 
 % This function computes the best response schedule of the uninformed
 % platform to prices contains in the price grid p_grid. The uninformed firm
@@ -76,14 +76,14 @@ for ii = 1:fineness
                         0.5*((1-p_good(x)) + (1-p_bad(x)))];       % Probability of the other guy not serving
 
     % Write the maximization function                   
-    to_max = @(x) -(x + future_gain) *2*market_each(x) - future_loss*2*market_none(x);
+    to_max = @(x) -(x + future_gain)*2*market_each(x) - future_loss*2*market_none(x);
                                         
     % Find the maximum
     [price_s(ii), ~, error_info] = fmincon(to_max, p_b, -1, 0, [], [], [], [], [], options);
 
     % Distribute the values
     market(ii) = market_each(price_s(ii))*2; 
-    profits(ii) =  prices_s(ii)*market(ii);
+    profits(ii) =  price_s(ii)*market(ii);
     
     % Fire a warning in case of error (I suppressed the output so it's
     % important to do so)
@@ -95,11 +95,11 @@ end
 if graphs == 1
     figure
     yyaxis left
-    plot(p_grid, sols)
+    plot(p_grid, price_s)
     hold on
     plot(p_grid, p_grid)
     yyaxis right
-    plot(p_grid, market_share)
+    plot(p_grid, market)
     hold on
     plot(p_grid, profits)
     legend('Price', 'Fixed line', 'Expected Market share', 'Expected Profits')
