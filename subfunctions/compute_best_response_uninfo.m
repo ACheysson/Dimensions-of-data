@@ -1,7 +1,7 @@
 function [sols, market_share_type_1, market_share_type_2, profits] = compute_best_response_uninfo(p_grid, alpha, s_1, activate)
 
 
-options = optimoptions('fmincon', 'Display','off');
+options = optimoptions('fmincon', 'Display','off', 'OptimalityTolerance', 1e-10);
 fineness = length(p_grid);
 sols = zeros(fineness,1);
 market_share_type_1 = zeros(fineness,2);

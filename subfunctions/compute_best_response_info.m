@@ -2,7 +2,7 @@ function [sols, market_share, profits] = compute_best_response_info(p_grid, alph
 
 
 
-options = optimoptions('fmincon', 'Display','off');
+options = optimoptions('fmincon', 'Display','off', 'OptimalityTolerance', 1e-10);
 fineness = length(p_grid);
 sols = zeros(fineness,1);
 market_share = zeros(fineness,2);

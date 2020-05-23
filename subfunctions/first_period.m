@@ -1,4 +1,4 @@
-function [sols, market_share] = first_period(p_grid, future_gain, alpha)
+function [sols, market_share] = first_period(p_grid, future_gain, alpha, graphs)
 
 %
 %
@@ -7,7 +7,7 @@ function [sols, market_share] = first_period(p_grid, future_gain, alpha)
 %
 %
 
-
+options = optimoptions('fmincon', 'Display','off', 'OptimalityTolerance', 1e-10);
 fineness = length(p_grid);
 sols = zeros(fineness,1);
 market_share = zeros(fineness,1);
@@ -17,7 +17,7 @@ profits = zeros(fineness,2);
 for ii = 1:fineness
     % Change p_b
     p_b = p_grid(ii);
-    exp_util_other = @(p_a) -(p_a + future_gain)* ...   % The utilty you extract out of every guy
+    exp_util_other = @(p_a) -(p_a+future_gain)* ...   % The utilty you extract out of every guy
                             	(0.5 * ...                   % The probability you play A
                                     (0.5 * ...               % The probability the other plays A
                                         (0.5 * ...           % The mass of agents A
@@ -66,7 +66,7 @@ for ii = 1:fineness
                                             (p_a-p_b <  0)*  (p_b-p_a>1)))));
                                         
     % Find the maximum
-    sols(ii) = fmincon(exp_util_other, 2, -1, 0);
+    sols(ii) = fmincon(exp_util_other, p_b, -1, 0, [], [], [], [], [], options);
     p_a = sols(ii);
     
     % Compute market shares
@@ -97,16 +97,16 @@ for ii = 1:fineness
    profits(ii) = market_share(ii)*p_a;                      
 end
 
-
-figure
-yyaxis left
-plot(p_grid, sols)
-hold on
-plot(p_grid, p_grid)
-yyaxis right
-plot(p_grid, market_share)
-hold on
-plot(p_grid, profits)
-legend('Price', 'Fixed line', 'Expected Market share', 'Expected Profits')
-
+if graphs == 1
+    figure
+    yyaxis left
+    plot(p_grid, sols)
+    hold on
+    plot(p_grid, p_grid)
+    yyaxis right
+    plot(p_grid, market_share)
+    hold on
+    plot(p_grid, profits)
+    legend('Price', 'Fixed line', 'Expected Market share', 'Expected Profits')
+end
 end
