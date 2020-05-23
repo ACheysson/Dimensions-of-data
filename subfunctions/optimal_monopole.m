@@ -19,9 +19,9 @@ options = optimoptions('fmincon', 'Display','off', 'OptimalityTolerance', 1e-10)
 
 
 % We first need to write the function optimized upon by the firm.
-profits = @(p) - (p+voi) * ...                  % Profit extracted from each agent (intensive margin)
-                 (prior*((p>alpha )*(alpha+1-p)+(p<=alpha)) + ...  % Probability of majority agent to like the good
-                 (1-prior)*(p<1)*(1-p));
+profits = @(p) - (p+voi) * ...                                     % Profit extracted from each agent (intensive margin)
+                 (prior*((p>alpha )*(alpha+1-p)+(p<=alpha)) + ...  % Probability of majority agent to like the good when good match
+                 (1-prior)*(p<1)*(1-p));                           % Probability of minority agent getting the good (bad match)
              
 % Find the maximum
 [optimal_price,profits,error_info] = fmincon(profits, alpha/2, -1, 0, [], [], [], [], [], options);
