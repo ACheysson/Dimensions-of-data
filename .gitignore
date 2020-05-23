@@ -1,6 +1,7 @@
 *.pdf
 *.asv
-archived-attemps\*
-meetings\*
-graphs\*
-written-work\*
+archived-attempts/*
+meetings/*
+graphs/*
+written-work/*
+matlab-results/*
