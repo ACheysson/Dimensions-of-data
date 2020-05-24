@@ -35,6 +35,10 @@ for ii = 1:fineness
     % Change p_b
     p_b = p_grid(ii);
     
+    if p_b == 1
+        stop = 1;
+    end
+    
     % We write three functions, they corresponds to the probability of
     % delivering more utility than the opponent firm
     
@@ -43,7 +47,6 @@ for ii = 1:fineness
     
     % Probability that you deliver a positive utility in wrong match
     p_bad = @(x) ((x<1)*(1-x));
-    
     
     % This is probability to get consumer, when both firms are serving the
     % same good, when using price x against price b
@@ -64,22 +67,24 @@ for ii = 1:fineness
                  (x - alpha - p_b <0)   *  (alpha+p_b-x>1));                                                % You get all consumers because you undercut rival by 1 - alpha
     
     % Compute the expected market share of each type
-    market_each =  @(x) [0.5*p_good(x), 0.5*p_bad(x)] * ... % The mass of agent A that joins you weighted by proba you play A
+    market_each =  @(x) 0.5*[0.5*p_good(x), 0.5*p_bad(x)] * ... % The mass of agent A that joins you weighted by proba you play A
                     [p_sup(x), p_equal(x);              % times if the other plays B, if the other plays A
                      p_equal(x), p_inf(x)] * ...        % times if the other plays B, if the other plays A
                      [0.5;                              % Proba if plays B
                       0.5];                             % Proba if plays A
                   
     % Compute the market share that will remain unserved.
-    market_none = @(x) [0.5*(1-p_good(x)), 0.5*(1-p_bad(x))] * ... % Mass of agents unserved times the probability of playing
-                       [0.5*((1-p_good(x)) + (1-p_bad(x)));
-                        0.5*((1-p_good(x)) + (1-p_bad(x)))];       % Probability of the other guy not serving
+    market_none = @(x) 0.5*[0.5*(1-p_good(x)), 0.5*(1-p_bad(x))] * ... % Mass of agents unserved times the probability of playing
+                       [1-p_good(x), 1-p_bad(x);
+                        1-p_good(x), 1-p_bad(x)]*                  ... % Probability of the other guy not serving
+                        [0.5;
+                         0.5];                                         % Probability of him serving him item
 
     % Write the maximization function                   
     to_max = @(x) -(x + future_gain)*2*market_each(x) - future_loss*2*market_none(x);
                                         
     % Find the maximum
-    [price_s(ii), ~, error_info] = fmincon(to_max, p_b, -1, 0, [], [], [], [], [], options);
+    [price_s(ii), ~, error_info] = fmincon(to_max, p_b-0.1, -1, 0, [], [], [], [], [], options);
 
     % Distribute the values
     market(ii) = market_each(price_s(ii))*2; 
